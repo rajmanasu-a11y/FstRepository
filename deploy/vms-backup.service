@@ -1,0 +1,10 @@
+# /etc/systemd/system/vms-backup.service  (template)
+[Unit]
+Description=Visitor Management System – database and photo backup
+
+[Service]
+Type=oneshot
+User=vms
+EnvironmentFile=/etc/vms/vms.env
+Environment=BACKUP_DIR=/var/backups/vms RETENTION_DAYS=30
+ExecStart=/opt/vms/scripts/backup.sh

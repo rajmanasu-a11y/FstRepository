@@ -1,0 +1,48 @@
+{
+  "name": "visitor-management-system",
+  "version": "1.0.0",
+  "description": "Visitor Management System — PostgreSQL-backed reception, security and reporting platform",
+  "private": true,
+  "type": "module",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "db:migrate": "node server/db/migrate.js",
+    "db:seed": "node server/db/seed.js",
+    "db:reset": "node server/db/migrate.js --reset && node server/db/seed.js",
+    "test": "npm run test:api && npm run test:e2e",
+    "test:api": "node --test --test-concurrency=1 \"tests/api/*.test.js\"",
+    "test:e2e": "playwright test",
+    "backup": "scripts/backup.sh",
+    "backup:verify": "scripts/verify-backup.sh",
+    "user:create-admin": "node server/db/create-admin.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.4",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "nodemailer": "^10.0.11",
+    "pdfkit": "^0.20.2",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}

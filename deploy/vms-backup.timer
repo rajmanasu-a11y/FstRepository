@@ -1,0 +1,10 @@
+# /etc/systemd/system/vms-backup.timer  (template) – nightly at 01:30
+[Unit]
+Description=Nightly Visitor Management System backup
+
+[Timer]
+OnCalendar=*-*-* 01:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

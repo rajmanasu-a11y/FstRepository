@@ -1,0 +1,22 @@
+# /etc/systemd/system/vms.service  (template – adjust paths and user)
+[Unit]
+Description=Visitor Management System
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=vms
+Group=vms
+WorkingDirectory=/opt/vms
+EnvironmentFile=/etc/vms/vms.env
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/vms
+
+[Install]
+WantedBy=multi-user.target
