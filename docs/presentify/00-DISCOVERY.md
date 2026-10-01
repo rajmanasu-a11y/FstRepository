@@ -11,7 +11,6 @@
 |---|---|---|
 | `…storage.zip` | **Empty archive** (22 bytes, zero entries). | No earlier source code was received. If you intended to share code, please re-upload. |
 | `…db_cluster-23-07-2025….backup.gz` | Supabase cluster dump. App schema = 4 tables: `profiles`, `presentations` (pdf/pptx/html), `user_notes`, `presentation_views`. Data: 1 profile, **0 presentations, 0 stored files**. | Nothing to migrate. Lessons taken (below). The dump contains a password hash, so it will **not** be committed to the repository. |
-| This repository (VMS) | Production-grade Node.js / Express 5 / PostgreSQL Visitor Management System with sessions, CSRF, RBAC, append-only audit, rate limiting, zod validation, PDF/XLSX/CSV exports, QR tokens, backup/restore scripts, nginx/systemd templates, 83 API + 43 Playwright tests. | Strong, already-tested foundation that can be reused for Presentify's security, audit, export and operations layers. |
 
 **Lessons from the earlier Presentify (Supabase) version**
 
@@ -40,7 +39,7 @@
 | A11 | **Retention vs audit trail.** Deleting participant data must not break audit integrity. | Legal + integrity. | Audit logs store participant *reference*, not personal data. Retention anonymises personal fields, keeps counts. |
 | A12 | **IP/device capture** is personal data under India's DPDP Act 2023 (assumed applicable law). | Consent notice, purpose limitation. | Store for security purposes only, disclosed in the notice, short retention. (Q14) |
 | A13 | **Video streaming at scale.** 300 phones streaming a 200 MB video over venue Wi-Fi will saturate it. | Venue experience. | Videos off by default, range-request streaming, per-org size limit, warning shown to admin. |
-| A14 | **Recommended stack (Next.js + FastAPI)** vs the existing, tested Node/PostgreSQL codebase in this repository. | Rewriting proven security code costs time and adds risk. | Recommend Node.js + TypeScript + React (see §3). (Q18) |
+| A14 | **Recommended stack (Next.js + FastAPI)** means two languages and two servers. | More toolchains to maintain; validation rules duplicated between UI and API. | Recommend TypeScript end-to-end with React (see §3). (Q18) |
 | A15 | **Organisation expiry** behaviour is undefined. | Live meetings could break mid-session. | Grace period proposal. (Q24) |
 
 ---
@@ -137,10 +136,7 @@ SMS OTP: **★ only if you name a provider** (otherwise not built in v1).
 
 ### 2.8 Hosting / Deployment
 
-**Q17. ★ Where should Presentify's code live?**
-- (a) A new `presentify/` folder **in this repository**, VMS left untouched *(default)*
-- (b) Replace the VMS in this repository
-- (c) A separate new repository (you would create it and give access)
+**Q17. Where does Presentify's code live?** — *Decided:* Presentify is a **standalone application** in its own `presentify/` folder. The Visitor Management System elsewhere in this repository is left untouched; Presentify shares no code, database or configuration with it.
 
 **Q18. Technology stack** — see §3. **Default:** Node.js + TypeScript backend, React + Vite admin UI, server-rendered participant pages, PostgreSQL. Say if you prefer Next.js + FastAPI (Python) instead.
 
@@ -204,7 +200,7 @@ Alternatives: "Scan. Register. View." · "One QR. Every Document." · "Paperless
 
 | Layer | Choice | Why it suits Presentify |
 |---|---|---|
-| Backend | **Node.js 22 LTS + TypeScript, Express 5**, zod validation | Reuses this repo's tested sessions/CSRF/RBAC/audit/exports/backup code; one language end-to-end; typed. |
+| Backend | **Node.js 22 LTS + TypeScript, Express 5**, zod validation | One language for UI and API; the same zod schemas validate forms in the browser and requests on the server and generate the OpenAPI document; mature libraries for QR, PDF (pdfkit) and Excel (exceljs) exports; small memory footprint for LAN servers. |
 | Admin UI | **React + Vite + TypeScript** (React Router, TanStack Query), compiled to static files | Rich forms/wizard/dashboards; no extra SSR server (simpler, works on LAN); strict CSP. Next.js adds a second server with no benefit for a logged-in admin app. |
 | Participant pages | **Server-rendered HTML**, < 60 KB, minimal JS | Fastest possible load when 500 phones scan at once; works on old phones; cached meeting data. |
 | Viewer | Self-hosted **PDF.js**, native image/video elements | No third-party services; download UI controllable. |
@@ -214,10 +210,10 @@ Alternatives: "Scan. Register. View." · "One QR. Every Document." · "Paperless
 | Office preview | LibreOffice headless (worker container) | Offline, private. |
 | Malware scan | ClamAV (optional container) | Feasible, standard. |
 | API docs | OpenAPI 3.1 generated from zod schemas; Swagger UI (admin-only in production) | Single source of truth. |
-| Tests | node:test/Vitest (API, security, DB) + Playwright (E2E, responsive, 1920×1080 projector) | Already proven in this repo. |
+| Tests | node:test/Vitest (API, security, DB) + Playwright (E2E, responsive, 1920×1080 projector) | Covers every test area in requirement §55. |
 | Deployment | Docker Compose (nginx, app, worker, postgres, optional minio/clamav) + bare-metal systemd option | Same artefacts for hosted and LAN. |
 
-**FastAPI alternative:** equally capable, but would discard the existing tested code and introduce two toolchains (Python + Node for the UI). Recommended only if your team maintains Python.
+**FastAPI alternative:** equally capable (Pydantic validation, built-in OpenAPI), but needs Python for the API plus Node for the UI build — two toolchains and duplicated validation rules. Recommended only if your team maintains Python.
 
 ---
 
@@ -332,7 +328,7 @@ Usage figures (storage used, counts) are computed from these tables via indexed 
 | Storage | Local disk volume | S3-compatible bucket (private) |
 | TLS | Trusted certificate required for phones (real domain + split DNS + DNS-validated cert) | Let's Encrypt |
 | Participants need | Venue Wi-Fi that can reach the server | Internet access |
-| Backups | `scripts/backup.sh` (pg_dump + storage sync) via systemd timer to off-site target | Same, or provider snapshots + dump |
+| Backups | `presentify/scripts/backup.sh` (pg_dump + storage sync) via systemd timer to off-site target | Same, or provider snapshots + dump |
 
 No "offline" claim will be made beyond what is implemented and tested.
 
