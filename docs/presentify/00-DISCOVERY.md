@@ -1,6 +1,6 @@
 # Presentify — Discovery, Clarifications & Proposed Design
 
-> **Status:** awaiting confirmation. No application code has been written.
+> **Status:** questions answered — decisions are recorded in [01-FINAL-REQUIREMENTS.md](01-FINAL-REQUIREMENTS.md), which supersedes the defaults below where they differ.
 > **Tagline (proposed):** *Present. Scan. Access.* — "One Presentation. One QR Code. Zero Unnecessary Paper."
 
 ---
