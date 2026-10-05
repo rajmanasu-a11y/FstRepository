@@ -1,0 +1,11 @@
+{
+  "name": "ElderLink",
+  "short_name": "ElderLink",
+  "description": "Trusted home care for senior citizens: nurses, hospitals, medicine reminders and SOS.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5f0",
+  "theme_color": "#0b6b62",
+  "lang": "en-IN",
+  "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
