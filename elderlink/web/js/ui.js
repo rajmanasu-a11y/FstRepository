@@ -229,3 +229,14 @@ export function barList(rows, { max } = {}) {
 export function empty(text, action) {
   return h`<div class="card flat" style="text-align:center;padding:28px"><p class="muted">${text}</p>${action || ''}</div>`;
 }
+
+/** In-page text prompt (window.prompt is blocked in embedded viewers). Resolves to the text, or null. */
+export function askText(label, { value = '', ok = t('Save') } = {}) {
+  return new Promise((resolve) => {
+    let done = false;
+    const close = modal(h`<h2>${label}</h2><form id="ask"><textarea id="ask-text" rows="3">${value}</textarea><button class="btn block" style="margin-top:12px">${ok}</button></form>`, (m) => {
+      m.querySelector('#ask').onsubmit = (e) => { e.preventDefault(); done = true; const v = m.querySelector('#ask-text').value.trim(); close(); resolve(v || null); };
+    });
+    const iv = setInterval(() => { if (!document.querySelector('.modal-bg')) { clearInterval(iv); if (!done) resolve(null); } }, 300);
+  });
+}

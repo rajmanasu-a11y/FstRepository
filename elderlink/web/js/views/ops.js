@@ -2,7 +2,7 @@
 // (FR-ADM-02, FR-VER), check-visit assignment (FR-CHK-02), quality desk (FR-QLT, FR-REV-08) and grievances (FR-GRV).
 import { api } from '../api.js';
 import { t } from '../i18n.js';
-import { h, icon, toast, modal, confirmBox, formData, fmtTime, fmtDate, fmtDateTime, fmtDay, money, stars, statusBadge, empty, ago } from '../ui.js';
+import { h, icon, toast, modal, confirmBox, askText, formData, fmtTime, fmtDate, fmtDateTime, fmtDay, money, stars, statusBadge, empty, ago } from '../ui.js';
 
 const back = (href, label = 'Back') => h`<a class="back" href="${href}">${icon('back')} ${t(label)}</a>`;
 const secs = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return s < 120 ? `${s}s` : s < 7200 ? `${Math.floor(s / 60)}m` : `${Math.floor(s / 3600)}h`; };
@@ -51,7 +51,7 @@ export async function desk(ctx) {
     title: 'SOS desk', html,
     mount(el) {
       el.querySelectorAll('[data-ack]').forEach((b) => b.onclick = async () => { try { await api.post(`/cases/${b.dataset.ack}/ack`); ctx.go(`#/ops/case/${b.dataset.ack}`); } catch (e) { toast(e.message, true); } });
-      el.querySelectorAll('[data-fu]').forEach((b) => b.onclick = async () => { const notes = prompt(t('Follow-up notes')) || 'Called family, senior stable'; try { await api.post(`/cases/${b.dataset.fu}/followup`, { notes }); ctx.refresh(); } catch (e) { toast(e.message, true); } });
+      el.querySelectorAll('[data-fu]').forEach((b) => b.onclick = async () => { const notes = await askText(t('Follow-up notes'), { value: 'Called family, senior stable' }); if (!notes) return; try { await api.post(`/cases/${b.dataset.fu}/followup`, { notes }); ctx.refresh(); } catch (e) { toast(e.message, true); } });
       timer = setInterval(() => { if (location.hash !== '#/ops/desk') return clearInterval(timer); ctx.refresh(); }, 10000);
     },
   };
@@ -117,7 +117,7 @@ export async function verify(ctx) {
       el.querySelectorAll('[data-cg]').forEach((card) => card.querySelectorAll('[data-act]').forEach((b) => b.onclick = async () => {
         const checks = Object.fromEntries([...card.querySelectorAll('[data-check]')].map((s) => [s.dataset.check, s.value]));
         let reason;
-        if (['reject', 'suspend'].includes(b.dataset.act)) { reason = prompt(t('Reason (shown to the caregiver)')); if (!reason) return; }
+        if (['reject', 'suspend'].includes(b.dataset.act)) { reason = await askText(t('Reason (shown to the caregiver)')); if (!reason) return; }
         try { await api.post(`/ops/verification/${card.dataset.cg}`, { action: b.dataset.act, checks, reason }); toast(t('Saved')); ctx.refresh(); } catch (e) { toast(e.message, true); }
       }));
     },
@@ -155,9 +155,9 @@ export async function quality(ctx) {
     title: 'Quality', html,
     mount(el) {
       const run = async (fn, msg) => { try { await fn(); toast(msg || t('Saved')); ctx.refresh(); } catch (e) { toast(e.message, true); } };
-      el.querySelectorAll('[data-ticket]').forEach((b) => b.onclick = () => { const rep = el.querySelector(`[data-rep="${b.dataset.ticket}"]`)?.value; const resolution = prompt(t('What did you do?')) || 'Called family and caregiver'; run(() => api.post(`/ops/tickets/${b.dataset.ticket}`, { resolution, replacementCaregiverId: rep || undefined }), rep ? t('Replacement booked at no extra cost') : t('Resolved')); });
+      el.querySelectorAll('[data-ticket]').forEach((b) => b.onclick = async () => { const rep = el.querySelector(`[data-rep="${b.dataset.ticket}"]`)?.value; const resolution = await askText(t('What did you do?'), { value: 'Called family and caregiver' }); if (!resolution) return; run(() => api.post(`/ops/tickets/${b.dataset.ticket}`, { resolution, replacementCaregiverId: rep || undefined }), rep ? t('Replacement booked at no extra cost') : t('Resolved')); });
       el.querySelectorAll('[data-flag]').forEach((b) => b.onclick = () => run(() => api.post(`/ops/flags/${b.dataset.flag}`, { action: b.dataset.a })));
-      el.querySelectorAll('[data-rev]').forEach((b) => b.onclick = () => { let reason; if (b.dataset.a === 'remove') { reason = prompt(t('Reason: abuse, personal data or proven fraud')); if (!reason) return; } run(() => api.post(`/ops/reviews/${b.dataset.rev}`, { action: b.dataset.a, reason: reason?.toLowerCase() })); });
+      el.querySelectorAll('[data-rev]').forEach((b) => b.onclick = async () => { let reason; if (b.dataset.a === 'remove') { reason = await askText(t('Reason: abuse, personal data or proven fraud'), { value: 'abuse' }); if (!reason) return; } run(() => api.post(`/ops/reviews/${b.dataset.rev}`, { action: b.dataset.a, reason: reason?.toLowerCase() })); });
       el.querySelectorAll('[data-sup]').forEach((b) => b.onclick = () => run(() => api.post(`/ops/supply/${b.dataset.sup}`, { status: 'sourcing' })));
       el.querySelectorAll('[data-scam]').forEach((b) => b.onclick = () => run(() => api.post(`/ops/scam/${b.dataset.scam}`, { advice: 'Called family; 1930 complaint guided' })));
     },
