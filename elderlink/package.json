@@ -15,5 +15,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
-  }
+  },
+  "author": "Ghyr Innovation",
+  "license": "UNLICENSED"
 }

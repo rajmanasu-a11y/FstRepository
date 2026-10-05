@@ -316,3 +316,4 @@ table.big td, table.big th { font-size: 1.05rem; padding: .7rem .5rem; }
 .senior-mode .demo-fab { top: auto; bottom: 150px; }
 .chip[disabled] { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
 .chip.on small { color: inherit; opacity: .9; }
+.site-foot { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); text-align: center; font-size: .85rem; color: var(--ink-2); }

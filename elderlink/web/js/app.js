@@ -99,7 +99,7 @@ function shell(contentHtml, path) {
         ${u ? h`<a class="iconbtn" href="#/notifications" aria-label="${t('Notifications')}">${icon('bell')}${state.unread ? h`<span class="dot">${state.unread > 9 ? '9+' : state.unread}</span>` : ''}</a>
         <a class="iconbtn" href="#/settings" aria-label="${t('Settings')}">${icon(seniorMode ? 'text' : 'settings')}</a>` : ''}
       </header>
-      <main id="main" tabindex="-1"><div id="view"></div></main>
+      <main id="main" tabindex="-1"><div id="view"></div><footer class="site-foot">ElderLink by Ghyr Innovation · © ${new Date().getFullYear()}</footer></main>
     </div>
   </div>
   ${u && nav.length ? h`<nav class="bottomnav" aria-label="${t('Main menu')}">${nav.slice(0, 5).map(([href, label, ic]) => h`<a class="${on(href)}" href="${href}">${icon(ic, 24)}<span>${t(label)}</span></a>`)}</nav>` : ''}

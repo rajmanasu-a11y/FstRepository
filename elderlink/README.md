@@ -1,5 +1,7 @@
 # ElderLink
 
+By **Ghyr Innovation**.
+
 ElderLink is a care marketplace for senior citizens in India. Hospitals, nursing homes, agencies and
 independent nurses near a senior's home list their services with a minimum charge. Seniors and the
 family members who pay choose a provider by verified reviews and a quality score. A monthly family
@@ -87,3 +89,7 @@ Payments, SMS, WhatsApp, calls, OCR and KYC are simulated.
 - Payments (UPI AutoPay, cards), DLT SMS, WhatsApp Business, IVR, masked calling, Aadhaar e-KYC, council registry checks, police verification and prescription OCR are mocked behind the same API shape.
 - To go live, each needs a licensed partner integration.
 - The JSON file store suits a pilot; production would move to a managed database.
+
+## License
+
+Copyright (c) 2026 Ghyr Innovation. All rights reserved. See [LICENSE](LICENSE).
